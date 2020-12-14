@@ -41,3 +41,4 @@ junit.xml
 .last_confs
 .saddle_history
 .idea
+**/artifacts/
