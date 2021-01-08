@@ -1,4 +1,6 @@
-const {accounts, contract, web3} = require("@openzeppelin/test-environment");
+const {accounts, contract, web3,defaultSender} = require("@openzeppelin/test-environment");
+let sender = defaultSender; 
+
 const {
     BN,          // Big Number support
     constants,    // Common constants, like the zero address and largest integers
@@ -26,7 +28,8 @@ describe("CToken", function () {
 
         this.MockDAI = await MockDAI.new();
 
-        this.MockDAI.mint(2000*1e22)
+        // this.value = new BN((20000e18).toString())
+        this.MockDAI.mint(this.value)
 
         //(uint baseRatePerYear, uint multiplierPerYear, uint jumpMultiplierPerYear, uint kink_)
         this.JumpRateModel = await JumpRateModel.new(1,1,1,1);
@@ -52,16 +55,25 @@ describe("CToken", function () {
     });
 
     it("compund mint", async () => {
-        let tx = await this.CErc20.mint(1);
-        console.log(tx)
+        let tx = await this.CErc20.mint(1e18.toString());
+        // console.log(tx)
     });
 
     it("should have correct name and symbol and decimal", async () => {
         let underlying = await this.CErc20.underlying();
-        let name = await this.CErc20.name();
-        console.log(underlying,name)
+        let name = await this.CErc20.name(); 
 
-        // expect(await this.mockERC20.totalSupply()).to.be.bignumber.equal(this.value);
+         let bal = await this.CErc20.balanceOf(sender);
+
+       
+        console.log(underlying,name,bal.toString())
+
+        let balSnapshot = await this.CErc20.getAccountSnapshot(sender);
+        for(let id in balSnapshot) {
+            console.log(balSnapshot[id].toString())
+        }
+
+        expect(await this.MockDAI.totalSupply()).to.be.bignumber.equal(this.value,"mock token mint");
     });
 
 

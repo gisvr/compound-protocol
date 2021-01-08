@@ -22,7 +22,8 @@
     "@openzeppelin/test-helpers": "^0.5.6",
     "bignumber.js": "9.0.0",
     "mocha": "^8.2.1",
-    "openzeppelin-solidity": "^2.5.1"
+    "openzeppelin-solidity": "^2.5.1",
+    "solc": "^0.8.0"
   },
   "resolutions": {
     "scrypt.js": "https://registry.npmjs.org/@compound-finance/ethereumjs-wallet/-/ethereumjs-wallet-0.6.3.tgz",
