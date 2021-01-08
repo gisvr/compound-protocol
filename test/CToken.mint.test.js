@@ -22,7 +22,7 @@ const JumpRateModel = contract.fromArtifact("JumpRateModel");
 const CErc20Delegate = contract.fromArtifact("CErc20Delegate");
 const CErc20Delegator = contract.fromArtifact("CErc20Delegator");
 
-
+let ethDecimalsBN = (new BN(10)).pow(new BN(18));
 
 describe("CToken", function () {
     const [alice, bob, minter] = accounts;
@@ -54,21 +54,78 @@ describe("CToken", function () {
         await this.Comptroller._supportMarket(this.CErc20.address)
 
     });
-    it("Mint", async () => {
+    it("Mint sender alice", async () => {
         let reserve = this.MockDAI;
         let cAddr = this.CErc20.address
-        await reserve.approve(cAddr, this.value)
-        let balance1 = await reserve.balanceOf(sender);
-        // await reserve.transfer(cAddr, amount); 
-        let tx = await this.CErc20.mint(this.value.div(new BN(50)), { from: sender });
+        
+        let amount = this.value.div(new BN(50));
+        let balance1 = await reserve.balanceOf(sender); 
+        await reserve.approve(cAddr, amount)
+        let tx = await this.CErc20.mint(amount, { from: sender }); 
 
-        let balance2 = await reserve.balanceOf(sender);
- 
+        await reserve.approve(cAddr, amount, { from: alice })
+        let tx1 = await this.CErc20.mint(amount, { from: alice }); 
+        let balance2 = await reserve.balanceOf(sender); 
+
         let balSnapshot = await this.CErc20.getAccountSnapshot(sender);
+         // return (uint(Error.NO_ERROR), cTokenBalance, borrowBalance, exchangeRateMantissa); 
+         expect(balSnapshot[1]).to.be.bignumber.equal(amount.mul(ethDecimalsBN))
+ 
+    });
+
+    it("Redeem sender", async () => {
+        let reserve = this.MockDAI;
+        let cAddr = this.CErc20.address 
+        let balance1 = await reserve.balanceOf(sender); 
+
+        let balSnapshot1 = await this.CErc20.getAccountSnapshot(sender);
+
+        let amount = this.value.div(new BN(60));
+        let rate = await this.CErc20.exchangeRateStored()
+        let _amount = amount.mul(ethDecimalsBN).div(rate); 
+        let tx = await this.CErc20.redeem(_amount, { from: sender }); 
+        let balance2 = await reserve.balanceOf(sender); 
+
+        let balSnapshot2 = await this.CErc20.getAccountSnapshot(sender);
+
+        expect(balance2).to.be.bignumber.equal(balance1.add(amount))
+
+        // expect(balSnapshot1[1]).to.be.bignumber.equal(balSnapshot2[1].sub(amount))
+        
+    });
+
+    it("Borrow alice", async () => {
+        let reserve = this.MockDAI;
+        let cAddr = this.CErc20.address 
+        let balance1 = await reserve.balanceOf(alice); 
+
+        let balSnapshot1 = await this.CErc20.getAccountSnapshot(alice);
+        let amount = this.value.div(new BN(600));
+
+        let rate = await this.CErc20.exchangeRateStored()
+        let _amount = amount.mul(ethDecimalsBN).div(rate); 
+        let tx = await this.CErc20.borrow(_amount, { from: alice }); 
+        console.log(tx.logs)
+        let balance2 = await reserve.balanceOf(alice); 
+ 
+        expect(balance2).to.be.bignumber.equal(balance1.add(amount))
+
+ 
+    });
+
+    it.skip("Repay Borrow alice", async () => {
+        let reserve = this.MockDAI;
+        let cAddr = this.CErc20.address 
+        let balance1 = await reserve.balanceOf(alice); 
+        let tx = await this.CErc20.repayBorrow("100", { from: alice }); 
+        let balance2 = await reserve.balanceOf(alice); 
+
+        let balSnapshot = await this.CErc20.getAccountSnapshot(alice);
         for (let id in balSnapshot) {
             console.log(balSnapshot[id].toString())
         }
     });
+ 
 
     it("should have correct name and symbol and decimal", async () => {
         let underlying = await this.CErc20.underlying();
