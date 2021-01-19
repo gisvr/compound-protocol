@@ -5,14 +5,6 @@
   "main": "index.js",
   "scripts": {
     "compile": "./script/compile",
-    "console": "if node -v | grep -E \"v(12|13)\" > /dev/null; then flags=\"-n --experimental-repl-await\"; fi; npx $flags saddle console",
-    "coverage": "./script/coverage",
-    "deploy": "./scenario/script/repl -s ./script/scen/deploy.scen",
-    "lint": "./script/lint",
-    "repl": "./scenario/script/repl",
-    "profile": "yarn test tests/gasProfiler.js",
-    "test": "./script/test",
-    "test:prepare": "NO_RUN=true ./script/test"
   },
   "repository": "git@github.com:compound-finance/compound-protocol.git",
   "author": "Compound Finance",
@@ -20,10 +12,8 @@
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.5",
     "@openzeppelin/test-helpers": "^0.5.6",
-    "bignumber.js": "9.0.0",
     "mocha": "^8.2.1",
-    "openzeppelin-solidity": "^2.5.1",
-    "solc": "^0.8.0"
+    "openzeppelin-solidity": "^2.5.1"
   },
   "resolutions": {
     "scrypt.js": "https://registry.npmjs.org/@compound-finance/ethereumjs-wallet/-/ethereumjs-wallet-0.6.3.tgz",
