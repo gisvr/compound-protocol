@@ -1,63 +1,58 @@
-// const HDWalletProvider = require("@truffle/hdwallet-provider");
+const HDWalletProvider = require('truffle-hdwallet-provider');
+const conf = require('./config/index');
 
-const {projectId,projectId1, privateKeys, etherscanKey,adminKey} = require("/Users/liyu/github/defi/secrets.json");
+require('dotenv').config();
 
-// console.log("etherscanKey",etherscanKey)
-
-// secrets.json like this
-// {
-//     "projectId": "082a56122ba64cdbaf9500ead7f6a5b9",
-//     "privateKeys": ["76d0.......45d"]
-// }
-
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-// const privateKeys = ["xxxxx....."]; // private keys
-
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
-
+let nodeProvider = conf[conf.network].node;
+nodeProvider.provider = new HDWalletProvider(process.env.MNENOMIC, nodeProvider.url, 10, 5);
+// nodeProvider.gas = 500e4 //"0xB71B00"; //12,000,000
 module.exports = {
-    migrations_directory: "./migrations",
-    api_keys: {
-        etherscan: etherscanKey
+  //自定义contracts目录
+  // contracts_directory: "./allMyStuff/someStuff/theContractFolder",
+  //自定义build目录
+  // contracts_build_directory: "./output",
+  // 自定义 deploy 目录
+  migrations_directory: './migrations/mint',
+
+  api_keys: {
+    etherscan: process.env.ETHERSCAN_KEY,
+  },
+
+  networks: {
+    development: nodeProvider,
+    main: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.MNENOMIC,
+          'https://mainnet.infura.io/v3/' + process.env.INFURA_API_KEY,
+          0,
+          10
+        ),
+      network_id: 1, // Main's id
+      gas: 3500000, // Gas sent with each transaction (default: ~5000000)
+      gasPrice: 90000000000, // 75 gwei (in wei) (default: 100 gwei)
     },
-    /**
-     * Networks define how you connect to your ethereum client and let you set the
-     * defaults web3 uses to send transactions. If you don't specify one truffle
-     * will spin up a development blockchain for you on port 9545 when you
-     * run `develop` or `test`. You can ask a truffle command to use a specific
-     * network from the command line, e.g
-     *
-     * $ truffle test --network <network-name>
-     */
+  },
 
+  plugins: ['solidity-coverage', 'truffle-plugin-verify'],
 
-    networks: {
-        development: {host: "127.0.0.1", port: 8545, network_id: "*"},
+  // Set default mocha options here, use special reporters etc.
+  mocha: {
+    // timeout: 100000
+  },
 
+  // Configure your compilers
+  compilers: {
+    solc: {
+      version: '0.5.16', // Fetch exact version from solc-bin (default: truffle's version)
+      // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
+      settings: {
+        // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+          enabled: true,
+          runs: 250,
+        },
+      },
     },
-
-    // Set default mocha options here, use special reporters etc.
-    mocha: {
-        // timeout: 100000
-    },
-
-    // Configure your compilers
-    compilers: {
-        solc: {
-            version: "0.5.16",    // Fetch exact version from solc-bin (default: truffle's version)
-            // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-            settings: {          // See the solidity docs for advice about optimization and evmVersion
-                optimizer: {
-                    enabled: true,
-                    runs: 200
-                },
-                //  evmVersion: "byzantium"
-            }
-        }
-    },
-    plugins: [
-        'truffle-plugin-verify'
-    ]
-}
+  },
+};

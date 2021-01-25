@@ -4,12 +4,15 @@
   "description": "The Compound Money Market",
   "main": "index.js",
   "scripts": {
-    "compile": "./script/compile",
+    "compile": "./script/compile"
   },
   "repository": "git@github.com:compound-finance/compound-protocol.git",
   "author": "Compound Finance",
   "license": "UNLICENSED",
   "devDependencies": {
+    "truffle": "^5.1.61",
+    "truffle-hdwallet-provider": "^1.0.17",
+    "dotenv": "^8.2.0",
     "@openzeppelin/test-environment": "^0.1.5",
     "@openzeppelin/test-helpers": "^0.5.6",
     "mocha": "^8.2.1",

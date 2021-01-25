@@ -105,10 +105,16 @@ describe("CToken", function () {
         let rate = await this.CErc20.exchangeRateStored()
         let _amount = amount.mul(ethDecimalsBN).div(rate); 
         let tx = await this.CErc20.borrow(_amount, { from: alice }); 
-        console.log(tx.logs)
+        // console.log(tx.logs)
+
+        //borrowFresh  return failOpaque(Error.COMPTROLLER_REJECTION, FailureInfo.BORROW_COMPTROLLER_REJECTION, allowed);
+        console.log(tx.logs[1].args.error.toString())  //3 ComptrollerErrorReporter.ERROR.INSUFFICIENT_SHORTFALL ->comptroller.borrowAllowed 
+        console.log(tx.logs[1].args.info.toString())   //14 TokenErrorReporter.BORROW_COMPTROLLER_REJECTION -> borrowFresh
+        console.log(tx.logs[1].args.detail.toString()) //16 ComptrollerErrorReporter. MARKET_NOT_LISTED -> mintAllowed 
+
         let balance2 = await reserve.balanceOf(alice); 
  
-        expect(balance2).to.be.bignumber.equal(balance1.add(amount))
+        expect(balance2).to.be.bignumber.equal(balance1.add(amount),"borrow")
 
  
     });
