@@ -89,8 +89,10 @@ contract Comptroller is ComptrollerV4Storage, ComptrollerInterface, ComptrollerE
     // liquidationIncentiveMantissa must be no greater than this value
     uint internal constant liquidationIncentiveMaxMantissa = 1.5e18; // 1.5
 
-    constructor() public {
+    address _comp;
+    constructor(address comp_) public {
         admin = msg.sender;
+        _comp = comp_;
     }
 
     /*** Assets You Are In ***/
@@ -1430,6 +1432,6 @@ contract Comptroller is ComptrollerV4Storage, ComptrollerInterface, ComptrollerE
      * @return The address of COMP
      */
     function getCompAddress() public view returns (address) {
-        return 0xc00e94Cb662C3520282E6f5717214004A7f26888;
+        return _comp;
     }
 }

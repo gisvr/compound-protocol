@@ -76,6 +76,11 @@ module.exports = {
     return getArttifact(path, addr);
   },
 
+  async getCompound(name, addr = false) {
+    let path = "/Users/liyu/github/defi/compound/compound-protocol/build/contracts/" + name + ".json";
+    return getArttifact(path, addr);
+},
+
   getAccounts() {
     return accounts;
   },

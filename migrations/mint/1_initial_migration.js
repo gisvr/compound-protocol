@@ -19,7 +19,13 @@ module.exports = async (deployer, network, accounts) => {
     let comptroller = await Comptroller.deployed();
 
     // //(uint baseRatePerYear, uint multiplierPerYear, uint jumpMultiplierPerYear, uint kink_)
-    await deployer.deploy(JumpRateModel, 1, 1, 1, 1);
+    let baseRatePerYear = "0"
+    let multiplierPerYear = "23782343987";
+    let jumpMultiplierPerYear = "518455098934";
+    let kink = "800000000000000000";
+    // this.JumpRateModel = await JumpRateModel.new(baseRatePerYear, multiplierPerYear, jumpMultiplierPerYear, kink);
+
+    await deployer.deploy(JumpRateModel, baseRatePerYear, multiplierPerYear, jumpMultiplierPerYear, kink);
     let jumpRateModel = await JumpRateModel.deployed();
 
 
@@ -36,10 +42,11 @@ module.exports = async (deployer, network, accounts) => {
         erc20Token.mint(value, { from: alice })
 
         console.log(symbol, erc20Token.address);
+        let initialExchangeRateMantissa = "150000000000000000"
         await deployer.deploy(CErc20, erc20Token.address,//    underlying_,
             comptroller.address, //  ComptrollerInterface comptroller_,
             jumpRateModel.address,   //     InterestRateModel interestRateModel_,
-            1, //    uint initialExchangeRateMantissa_,
+            initialExchangeRateMantissa, //    uint initialExchangeRateMantissa_,
             "MC name " + symbol, //  string memory name_,
             "c" + symbol, //   string memory symbol_,
             18,  //     uint8 decimals_,
@@ -54,7 +61,7 @@ module.exports = async (deployer, network, accounts) => {
 
     }
 
-    await deployer.deploy(CEther, 
+    await deployer.deploy(CEther,
         comptroller.address, //  ComptrollerInterface comptroller_,
         jumpRateModel.address,   //     InterestRateModel interestRateModel_,
         1, //    uint initialExchangeRateMantissa_,
@@ -62,12 +69,12 @@ module.exports = async (deployer, network, accounts) => {
         "cETH", //   string memory symbol_,
         18,  //     uint8 decimals_,
         sender  //     address payable admin_, 
-    ); 
+    );
     let cEther = await CEther.deployed()
-     // 加入市场
-     await comptroller.enterMarkets([cEther.address])
-     // 上架
-     await comptroller._supportMarket(cEther.address)
+    // 加入市场
+    await comptroller.enterMarkets([cEther.address])
+    // 上架
+    await comptroller._supportMarket(cEther.address)
 
     const cTokens = await comptroller.getAllMarkets();
     console.log(cTokens)

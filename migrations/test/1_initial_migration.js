@@ -60,6 +60,9 @@ module.exports = async (deployer, network, accounts) => {
     // 上架
     await comptroller._supportMarket(cToken.address)
     await comptroller._supportMarket(cEther.address)
+
+  
+    
  
     const cTokens = await comptroller.getAllMarkets();
     console.log(cTokens)
