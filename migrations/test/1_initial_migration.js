@@ -4,6 +4,8 @@ const MockDAI = artifacts.require("MockDAI");
 
 const CErc20 = artifacts.require("CErc20Immutable");
 
+const CEther = artifacts.require("CEther")
+
 const Comptroller = artifacts.require("Comptroller");
 const JumpRateModel = artifacts.require("JumpRateModel");
 
@@ -33,20 +35,33 @@ module.exports = async (deployer, network, accounts) => {
         comptroller.address, //  ComptrollerInterface comptroller_,
         jumpRateModel.address,   //     InterestRateModel interestRateModel_,
         1, //    uint initialExchangeRateMantissa_,
-        "MC name", //  string memory name_,
-        "MC", //   string memory symbol_,
+        "MC name DAI", //  string memory name_,
+        "cDAI", //   string memory symbol_,
         18,  //     uint8 decimals_,
         sender  //     address payable admin_, 
     );
 
+    await deployer.deploy(CEther, 
+        comptroller.address, //  ComptrollerInterface comptroller_,
+        jumpRateModel.address,   //     InterestRateModel interestRateModel_,
+        1, //    uint initialExchangeRateMantissa_,
+        "cETH name", //  string memory name_,
+        "cETH", //   string memory symbol_,
+        18,  //     uint8 decimals_,
+        sender  //     address payable admin_, 
+    );
+
+
     let cToken = await CErc20.deployed()
+    let cEther = await CEther.deployed()
 
     // 加入市场
-    await comptroller.enterMarkets([cToken.address])
+    await comptroller.enterMarkets([cToken.address,cEther.address])
     // 上架
     await comptroller._supportMarket(cToken.address)
-
-    // const cTokens = await comptroller.getAllMarkets();
-    // console.log(cTokens)
+    await comptroller._supportMarket(cEther.address)
+ 
+    const cTokens = await comptroller.getAllMarkets();
+    console.log(cTokens)
 
 };

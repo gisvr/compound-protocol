@@ -3,20 +3,63 @@ const MockDAI = artifacts.require("MockDAI");
 
 const CErc20 = artifacts.require("CErc20Immutable");
 
+const CEther = artifacts.require("CEther")
+
 const Comptroller = artifacts.require("Comptroller");
 const JumpRateModel = artifacts.require("JumpRateModel");
 let BN = web3.utils.BN;
 
- 
+const advanceBlockAtTime = () => {
+    let time = new Date().getTime() + 10000000
+    return new Promise((resolve, reject) => {
+        web3.currentProvider.send(
+            {
+                jsonrpc: "2.0",
+                method: "evm_mine",
+                params: [time],
+                id: new Date().getTime(),
+            },
+            (err, _) => {
+                if (err) {
+                    return reject(err);
+                }
+                const newBlockHash = web3.eth.getBlock("latest").hash;
+
+                return resolve(newBlockHash);
+            },
+        );
+    });
+};
 module.exports = async (deployer, network, accounts) => {
     let [sender, alice] = accounts;
-    let amount = 1e19.toString();
+    let amount = 1e20.toString();
+
     let comptroller = await Comptroller.deployed();
     const cTokens = await comptroller.getAllMarkets();
     for (let addr of cTokens) {
-
         let cToken = await CErc20.at(addr)
+        let cSymbol = await cToken.symbol()
+
+        if (cSymbol == "cETH") {
+            let cETH = await CEther.at(addr)
+            let ethAmount = 2e18.toString();
+            let ethRec1 = await cETH.mint({ from: sender, value: ethAmount });
+            console.log("ETH mint", ethRec1.tx)
+
+            let ethBorrowAmount = 1e18.toString()
+            let ethRec2 = await cETH.borrow(ethBorrowAmount, { from: sender });
+            console.log("ETH borrow", ethRec2.tx)
+
+            let ethRedeemAmount = 1e17.toString()
+            let ethRec3 = await cETH.redeem(ethRedeemAmount, { from: sender });
+            console.log("ETH redeem", ethRec3.tx)
+
+            continue;
+        }
+
         let underlying = await cToken.underlying()
+        console.log("symbol %s, addr %s , underlying: %s", cSymbol, cToken.address, underlying);
+
         // console.log(underlying);
         let erc20Token = await MockDAI.at(underlying);
         erc20Token.mint(amount)

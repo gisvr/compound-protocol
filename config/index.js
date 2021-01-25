@@ -1,5 +1,5 @@
 module.exports = {
-  network: 'geth', 
+  network: 'ganache', 
   ganache: require('./ganache'),
   geth: require('./geth'),
   vpsorGanache: require('./vpsorGanache'),
