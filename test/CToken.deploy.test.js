@@ -40,17 +40,28 @@ describe("CToken", function () {
         this.MockDAI.mint(this.value)
         this.MockDAI.mint(this.value, { from: alice })
 
-        this.Comp = await Comp.new(alice);
+       
 
-        this.Comptroller = await Comptroller.new(this.Comp.address);
+         // 1 Create PriceOracle
+         let simplePriceOracle = await SimplePriceOracle.new() 
+         await simplePriceOracle.setDirectPrice(this.MockDAI.address, ethDecimalsBN.div(new BN(10)))
+         // 2 Create comptroller
+         this.Comp = await Comp.new(alice); 
+         this.Comptroller = await Comptroller.new(this.Comp.address);
 
-
-        // DAI 
+         // 3 Set PriceOracle
+         await this.Comptroller._setPriceOracle(simplePriceOracle.address)
+  
+        //  4 Create Rate model
         let baseRatePerYear = "0"
         let multiplierPerYear = "23782343987";
         let jumpMultiplierPerYear = "518455098934";
         let kink = "800000000000000000";
         this.JumpRateModel = await JumpRateModel.new(baseRatePerYear, multiplierPerYear, jumpMultiplierPerYear, kink);
+
+       
+        // 4 Liquidator
+
 
         let initialExchangeRateMantissa = "150000000000000000"
         this.CErc20 = await CErc20.new(
@@ -64,13 +75,10 @@ describe("CToken", function () {
             sender  //     address payable admin_, 
         );
 
-        let simplePriceOracle = await SimplePriceOracle.new()
-
-        await simplePriceOracle.setDirectPrice(this.MockDAI.address, ethDecimalsBN.div(new BN(10)))
+       
 
 
-
-        await this.Comptroller._setPriceOracle(simplePriceOracle.address)
+     
 
 
         // 上架

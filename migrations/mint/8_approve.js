@@ -9,27 +9,7 @@ const Comptroller = artifacts.require("Comptroller");
 const JumpRateModel = artifacts.require("JumpRateModel");
 let BN = web3.utils.BN;
 
-const advanceBlockAtTime = () => {
-    let time = new Date().getTime() + 10000000
-    return new Promise((resolve, reject) => {
-        web3.currentProvider.send(
-            {
-                jsonrpc: "2.0",
-                method: "evm_mine",
-                params: [time],
-                id: new Date().getTime(),
-            },
-            (err, _) => {
-                if (err) {
-                    return reject(err);
-                }
-                const newBlockHash = web3.eth.getBlock("latest").hash;
-
-                return resolve(newBlockHash);
-            },
-        );
-    });
-};
+ 
 module.exports = async (deployer, network, accounts) => {
     let [sender, alice] = accounts;
     let amount = 1e20.toString();
