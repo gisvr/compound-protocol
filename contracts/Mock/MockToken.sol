@@ -23,3 +23,22 @@ contract MockDAI is MintableERC20 {
     string public symbol = "DAI";
     string public name = "DAI Token";
 }
+
+contract MockUSDC is MintableERC20 {
+    uint256 public decimals = 6;
+    string public symbol = "USDC";
+    string public name = "USDC Token";
+}
+
+contract MockBAT is MintableERC20 {
+    uint256 public decimals = 18;
+    string public symbol = "BAT";
+    string public name = "BAT Token";
+}
+
+contract MockWBTC is MintableERC20 {
+    uint256 public decimals = 8;
+    string public symbol = "WBTC";
+    string public name = "WBTC Token";
+}
+

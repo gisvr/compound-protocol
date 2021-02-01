@@ -42,3 +42,4 @@ junit.xml
 .saddle_history
 .idea
 **/artifacts/
+.vscode/settings.json

@@ -39,15 +39,18 @@ describe("CToken", function () {
         this.MockDAI = await MockDAI.new();
         this.MockDAI.mint(this.value)
         this.MockDAI.mint(this.value, { from: alice })
-
-       
-
+ 
          // 1 Create PriceOracle
          let simplePriceOracle = await SimplePriceOracle.new() 
          await simplePriceOracle.setDirectPrice(this.MockDAI.address, ethDecimalsBN.div(new BN(10)))
+         
+         
+        
          // 2 Create comptroller
          this.Comp = await Comp.new(alice); 
          this.Comptroller = await Comptroller.new(this.Comp.address);
+         //  Unitroller
+         let unitroller = await Unitroller.new()   
 
          // 3 Set PriceOracle
          await this.Comptroller._setPriceOracle(simplePriceOracle.address)
